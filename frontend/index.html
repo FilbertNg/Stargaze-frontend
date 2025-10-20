@@ -146,10 +146,66 @@
         </div>
     </div>    
 
-    <!-- ============ ABOUT US ============= -->
-    <div>
+    <!-- ============ TESTING API ============= -->
+    <div id="stats-container"></div>
 
-    </div>
+   <script>
+   const API_URL = 'https://incredible-respect-f1309c941e.strapiapp.com/api/statistics?mode=grants';
+
+   async function fetchStats() {
+   const container = document.getElementById('stats-container');
+   container.innerHTML = '<p style="color:#999;font-family:sans-serif;">Loading...</p>';
+   try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      const formatNum = n => (typeof n === 'number' ? n.toLocaleString() : n);
+      const formatMoney = n => (typeof n === 'number' ? '₱' + n.toLocaleString() : n);
+      const formatPct = n => (typeof n === 'number' ? (n * 100).toFixed(1) + '%' : n);
+
+      container.innerHTML = `
+         <div style="
+         display:grid;
+         grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+         gap:10px;
+         font-family:Inter, sans-serif;
+         color:#e6eef6;
+         background:#0f1724;
+         padding:16px;
+         border-radius:12px;
+         ">
+         ${[
+            ['PhD', data.totalPhd],
+            ['Masters', data.totalMaster],
+            ['Papers', data.totalPaper],
+            ['Patents', data.totalPatent],
+            ['Grants', data.totalGrants],
+            ['Industry Grants', data.totalIndustryGrants],
+            ['Internal Grants', data.totalInternalGrants],
+            ['National Grants', data.totalNationalGrants],
+            ['Delivery Rate', formatPct(data.deliveryRate)],
+            ['Total Funding', formatMoney(data.totalFunding)],
+         ].map(([k,v]) => `
+            <div style="
+               background:rgba(255,255,255,0.05);
+               padding:12px;
+               border-radius:8px;
+            ">
+               <div style="font-size:13px;color:#9aa6b2">${k}</div>
+               <div style="font-size:20px;font-weight:600">${v ?? '—'}</div>
+            </div>
+         `).join('')}
+         </div>
+      `;
+   } catch (err) {
+      container.innerHTML = `<p style="color:#ffb4b4;font-family:sans-serif;">Error: ${err.message}</p>`;
+   }
+   }
+
+   fetchStats();
+   </script>
+
 
       <!--=============== MAIN JS ===============-->
       <script src="assets/js/main.js"></script>
